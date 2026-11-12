@@ -1,0 +1,9 @@
+# segredos
+.env
+**/.env
+# pesados / gerados
+node_modules/
+liberou-remotion/out/
+# vídeos de referência de terceiros (não versionar)
+referencias/
+ep01-cenas/
