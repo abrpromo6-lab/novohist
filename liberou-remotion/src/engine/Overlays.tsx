@@ -9,14 +9,14 @@ export const {fontFamily} = loadFont('normal', {weights: ['800', '900'], subsets
 export const lineFrames = (l: Line, fps: number) =>
   Math.round((l.sec ?? Math.max(1.7, l.text.length * 0.062 + 0.7)) * fps);
 
-export const Stamp: React.FC<{text: string}> = ({text}) => (
+export const Stamp: React.FC<{text: string; alert?: boolean}> = ({text, alert}) => (
   <div
     style={{
       position: 'absolute',
       top: 92,
       left: '50%',
       transform: 'translateX(-50%)',
-      background: 'rgba(16,22,40,0.88)',
+      background: alert ? 'rgba(170,20,20,0.92)' : 'rgba(16,22,40,0.88)',
       color: '#fff',
       fontFamily,
       fontWeight: 900,
@@ -79,7 +79,7 @@ export const activeSpeaker = (lines: Line[], frame: number, fps: number, offset 
 
 export const RedTint: React.FC = () => {
   const frame = useCurrentFrame();
-  const a = 0.32 + Math.sin(frame / 5) * 0.06;
+  const a = 0.17 + Math.sin(frame / 8) * 0.03;
   return <AbsoluteFill style={{background: `rgba(190,10,10,${a})`, mixBlendMode: 'multiply'}} />;
 };
 
@@ -315,3 +315,46 @@ export const EndCard: React.FC<{opt1: string; opt2: string; next: number; icon1?
     </AbsoluteFill>
   );
 };
+
+// Texto-gancho dos primeiros segundos: entra rápido e firme, sem efeito brega
+export const HookText: React.FC<{text: string; sec?: number}> = ({text, sec = 2.6}) => {
+  const frame = useCurrentFrame();
+  const {fps} = useVideoConfig();
+  const end = sec * fps;
+  const inT = interpolate(frame, [0, 5], [0, 1], {extrapolateRight: 'clamp'});
+  const out = interpolate(frame, [end - 6, end], [1, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
+  if (frame > end) return null;
+  const [a, b] = text.split('|');
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        top: '17%',
+        left: 50,
+        right: 50,
+        textAlign: 'center',
+        opacity: inT * out,
+        transform: `scale(${1.06 - inT * 0.06})`,
+        fontFamily,
+        fontWeight: 900,
+        lineHeight: 1.04,
+        WebkitTextStroke: '16px #0b0b0b',
+        paintOrder: 'stroke fill',
+        textShadow: '0 8px 0 rgba(0,0,0,0.35)',
+      }}
+    >
+      <div style={{fontSize: 86, color: '#ffd23f'}}>{a}</div>
+      {b ? <div style={{fontSize: 104, color: '#ffffff', marginTop: 8}}>{b}</div> : null}
+    </div>
+  );
+};
+
+// Brilho do farol: suave, cresce com a chegada do ônibus
+export const Glare: React.FC<{strength: number}> = ({strength}) => (
+  <AbsoluteFill
+    style={{
+      background: `radial-gradient(ellipse 55% 30% at 50% 52%, rgba(255,246,214,${0.55 * strength}) 0%, rgba(255,230,170,${0.18 * strength}) 45%, rgba(0,0,0,0) 75%)`,
+      mixBlendMode: 'screen',
+    }}
+  />
+);

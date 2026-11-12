@@ -301,7 +301,11 @@ export const Character: React.FC<CharProps> = ({
   const hr = 0.27;
 
   return (
-    <group position={position} rotation={[0, rotY, 0]} scale={sc}>
+    <group
+      position={pose === 'sit' ? [position[0], position[1] - 0.4 * sc, position[2]] : position}
+      rotation={[0, rotY, 0]}
+      scale={sc}
+    >
       {/* pernas */}
       {spec.dress ? (
         <mesh position={[0, 0.72, 0]}>
@@ -310,7 +314,11 @@ export const Character: React.FC<CharProps> = ({
         </mesh>
       ) : null}
       {[-0.11, 0.11].map((x, i) => (
-        <group key={x} position={[x, 0.86, 0]} rotation={[(i ? -sw : sw) * 0.8, 0, 0]}>
+        <group
+          key={x}
+          position={[x, 0.86, 0]}
+          rotation={[pose === 'sit' ? -1.35 + Math.sin(frame / 6 + i * 2) * 0.12 : (i ? -sw : sw) * 0.8, 0, 0]}
+        >
           <Box size={[0.17, 0.82, 0.19]} color={spec.dress ? spec.skin : spec.bottom} position={[0, -0.41, 0]} />
           <Box size={[0.19, 0.08, 0.28]} color={spec.shoes ?? '#2b2b2b'} position={[0, -0.84, 0.04]} />
         </group>
@@ -422,4 +430,6 @@ export const CAST: Record<string, CharSpec> = {
   mulher: {skin: '#6e4529', top: '#e8a33d', bottom: '#3b3b6b', hair: 'long', female: true},
   briga1: {skin: '#d1a27a', top: '#2f6fb3', bottom: '#444444', hair: 'cap', hairColor: '#b33'},
   briga2: {skin: '#6b4026', top: '#f2f2f2', bottom: '#1f3b5c', hair: 'short'},
+  tonho: {skin: '#6b4026', top: '#ece6d4', bottom: '#4a4a4a', hair: 'short', hairColor: '#d4d4d4', mustache: true},
+  motorista: {skin: '#a87650', top: '#2f5fbf', bottom: '#2b2b2b', hair: 'cap', hairColor: '#1f3b7a'},
 };

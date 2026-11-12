@@ -10,8 +10,9 @@ import {Kitchen} from '../three/sets/Kitchen';
 import {House, Street} from '../three/sets/Street';
 import {Cart, ChainCoil, Jug, Market, Padlock} from '../three/sets/Market';
 import {Lights, Sky} from '../three/sets/common';
+import {Bedroom, BusInside, BusStop, MaskProp, StreetRun} from '../three/sets/Ep02Sets';
 import {Box} from '../three/toon';
-import {activeSpeaker, Black, Captions, Peek, RedTint, Stamp, Vignette, lineFrames} from './Overlays';
+import {activeSpeaker, Black, Captions, Glare, HookText, Peek, RedTint, Stamp, Vignette, lineFrames} from './Overlays';
 import type {Actor, SceneSpec, V3} from './types';
 
 export const USE_FISHEYE = true;
@@ -154,6 +155,18 @@ const phoneTexture = (title: string, text: string, clock: string) => {
   return t;
 };
 
+// Posição do ônibus e abertura da porta ao longo da cena
+const busState = (spec: SceneSpec, frame: number, dur: number) => {
+  if (!spec.bus) return undefined;
+  const fps = 30;
+  const arrive = (spec.bus.arriveSec ?? dur / fps) * fps;
+  const z = interpolate(frame, [0, arrive], spec.bus.z, {extrapolateRight: 'clamp', easing: Easing.out(Easing.cubic)});
+  const door = spec.bus.door
+    ? interpolate(frame, [dur * 0.2, dur * 0.45], spec.bus.door, {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'})
+    : 0;
+  return {z, door};
+};
+
 const World: React.FC<{spec: SceneSpec; frame: number; dur: number; speaking: string | null}> = ({spec, frame, dur, speaking}) => {
   const time = spec.time ?? 'dusk';
   const phoneTex = useMemo(
@@ -163,7 +176,22 @@ const World: React.FC<{spec: SceneSpec; frame: number; dur: number; speaking: st
   const set = spec.set;
   return (
     <>
-      <Lights time={set.startsWith('market') ? 'market' : set === 'kitchen' ? 'indoor' : time} />
+      <Lights time={set.startsWith('market') || set === 'bus-inside' ? 'market' : set === 'kitchen' || set === 'bedroom' ? 'indoor' : time} />
+      {set === 'bedroom' && <Bedroom frame={frame} doorOpen={spec.doorOpen} ringing={spec.ringing} time={time} />}
+      {set === 'street-run' && <StreetRun frame={frame} time={time} />}
+      {set === 'busstop' && <BusStop frame={frame} time={time} bus={busState(spec, frame, dur)} />}
+      {set === 'bus-inside' && <BusInside frame={frame} />}
+      {spec.maskReveal && (
+        <MaskProp
+          position={spec.maskReveal.pos}
+          size={spec.maskReveal.size}
+          rotY={interpolate(frame, [dur * 0.15, dur * 0.45], spec.maskReveal.rotY, {
+            extrapolateLeft: 'clamp',
+            extrapolateRight: 'clamp',
+            easing: Easing.inOut(Easing.cubic),
+          })}
+        />
+      )}
       {set === 'kitchen' && <Kitchen time={time} />}
       {set === 'street' && <Street time={time} frame={frame} sparks={spec.sparks} />}
       {set === 'street-house' && (
@@ -193,7 +221,7 @@ const World: React.FC<{spec: SceneSpec; frame: number; dur: number; speaking: st
 // Um <Audio> por fala, começando junto com a legenda
 const Voices: React.FC<{spec: SceneSpec}> = ({spec}) => {
   const {fps} = useVideoConfig();
-  let t = 6;
+  let t = spec.captionOffset ?? 6;
   return (
     <>
       {(spec.sfx ?? []).map((s, i) => (
@@ -218,7 +246,7 @@ export const SceneView: React.FC<{spec: SceneSpec}> = ({spec}) => {
   const frame = useCurrentFrame();
   const {fps, width, height} = useVideoConfig();
   const dur = sceneFrames(spec, fps);
-  const speaking = activeSpeaker(spec.lines, frame, fps);
+  const speaking = activeSpeaker(spec.lines, frame, fps, spec.captionOffset ?? 6);
   const blur =
     spec.blur === 'all' ? 6 : spec.blur === 'start' ? interpolate(frame, [0, 10], [14, 0], {extrapolateRight: 'clamp'}) : 0;
 
@@ -227,7 +255,7 @@ export const SceneView: React.FC<{spec: SceneSpec}> = ({spec}) => {
       <AbsoluteFill>
         <Black />
         <Voices spec={spec} />
-        <Captions lines={spec.lines} />
+        <Captions lines={spec.lines} offset={spec.captionOffset} />
       </AbsoluteFill>
     );
   }
@@ -254,8 +282,10 @@ export const SceneView: React.FC<{spec: SceneSpec}> = ({spec}) => {
       <Vignette strength={spec.time === 'night' ? 0.75 : 0.4} />
       {spec.red && <RedTint />}
       {spec.peek && <Peek />}
-      {spec.stamp && <Stamp text={spec.stamp} />}
-      <Captions lines={spec.lines} top={spec.captionTop} />
+      {spec.glare && <Glare strength={interpolate(frame, [0, dur * 0.7], [0.1, 1], {extrapolateRight: 'clamp'})} />}
+      {spec.stamp && <Stamp text={spec.stamp} alert={spec.stampAlert} />}
+      {spec.hook && <HookText text={spec.hook} />}
+      <Captions lines={spec.lines} top={spec.captionTop} offset={spec.captionOffset} />
       <Voices spec={spec} />
     </AbsoluteFill>
   );

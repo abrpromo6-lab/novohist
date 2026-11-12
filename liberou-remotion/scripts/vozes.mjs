@@ -22,6 +22,8 @@ export const VOZES = {
   homem2: {id: 'WFSxKvz27RguNRD3Phoq', nome: 'Wesley Bessa', tag: '[softly] [suspicious]'},
   caixa: {id: 'YklVF5l1Q8os8glyd5SM', nome: 'Camilla', tag: '[softly]'},
   tiarosa: {id: 'WlyexGXUZChMcXINS0SV', nome: 'Amanda (calma)', tag: TOM},
+  tonho: {id: 'bqGNAuwlV9Yp1InN7IgE', nome: 'Wilson Wong (idoso)', tag: '[urgent] [worried]'},
+  motorista: {id: 'yxcG28bYeAMra6K4nj10', nome: 'Osmar (calmo)', tag: '[flat] [tired]'},
 };
 
 buildSync({entryPoints: [`src/episodes/${ep}.ts`], bundle: true, format: 'esm', platform: 'node', outfile: `out/${ep}.mjs`, logLevel: 'error', external: ['three', 'react']});

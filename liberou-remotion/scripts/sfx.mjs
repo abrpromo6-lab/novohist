@@ -19,6 +19,17 @@ export const SFX = {
   portao: {p: 'old metal gate creaking slowly', d: 2.5},
   batidas: {p: 'three slow loud knocks on a metal gate, distant, ominous', d: 4},
   impacto: {p: 'deep cinematic horror impact hit with reverb tail', d: 3},
+  abertura: {p: 'subtle tense cinematic low hit with soft reverse swell, clean, not loud, horror short', d: 2},
+  porta_quarto: {p: 'wooden bedroom door pushed open quickly, short creak', d: 1.5},
+  vento: {p: 'evening wind blowing through an open bedroom window, curtain fabric flapping softly, no music', d: 10, amb: true},
+  vibracao: {p: 'smartphone vibrating on a mattress under a pillow with a muffled ringtone', d: 4},
+  chaves: {p: 'house keys grabbed quickly from a table, jingle', d: 1.2},
+  portao_batendo: {p: 'metal house gate slammed shut and padlocked in the distance', d: 2},
+  onibus_chegando: {p: 'city bus approaching at night and stopping with loud air brake hiss', d: 5},
+  porta_onibus: {p: 'pneumatic bus door opening with air hiss', d: 2},
+  porta_onibus_fecha: {p: 'pneumatic bus door closing with air hiss and thud', d: 2},
+  motor_onibus: {p: 'city bus diesel engine idling, heard from inside, steady low rumble, no music', d: 10, amb: true},
+  rua_noite: {p: 'quiet street at dusk, distant dogs barking, a gate closing far away, light wind, no music', d: 12, amb: true},
 };
 
 if (process.argv[1].endsWith('sfx.mjs')) {

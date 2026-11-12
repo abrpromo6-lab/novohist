@@ -31,6 +31,9 @@ export const Capa: React.FC<{spec: SceneSpec; ep: string; hook: string}> = ({spe
       >
         LIBEROU
       </div>
+    </div>
+    {/* gancho */}
+    <div style={{position: 'absolute', bottom: 430, left: 0, right: 0, textAlign: 'center'}}>
       <div
         style={{
           display: 'inline-block',
@@ -49,7 +52,6 @@ export const Capa: React.FC<{spec: SceneSpec; ep: string; hook: string}> = ({spe
         {ep}
       </div>
     </div>
-    {/* gancho */}
     <div
       style={{
         position: 'absolute',

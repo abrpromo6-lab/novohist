@@ -13,7 +13,9 @@ export type Speaker =
   | 'homem1'
   | 'homem2'
   | 'caixa'
-  | 'tiarosa';
+  | 'tiarosa'
+  | 'tonho'
+  | 'motorista';
 
 export const SPEAKER_COLOR: Record<Speaker, string> = {
   voce: '#ffffff',
@@ -25,6 +27,8 @@ export const SPEAKER_COLOR: Record<Speaker, string> = {
   homem2: '#c3a6ff',
   caixa: '#ff8fab',
   tiarosa: '#ff9ee5',
+  tonho: '#ffa94d',
+  motorista: '#d7dee3',
 };
 
 export type Line = {who: Speaker; text: string; sec?: number; audio?: string};
@@ -57,7 +61,11 @@ export type SetId =
   | 'market-party'
   | 'market-checkout'
   | 'black'
-  | 'end';
+  | 'end'
+  | 'bedroom'
+  | 'street-run'
+  | 'busstop'
+  | 'bus-inside';
 
 export type Cam = {
   from: V3;
@@ -90,4 +98,12 @@ export type SceneSpec = {
   sign?: boolean;
   captionTop?: boolean; // legenda no alto (ex.: cena do celular)
   sfx?: Sfx[];
+  hook?: string; // texto grande dos primeiros segundos
+  stampAlert?: boolean; // etiqueta vermelha (contagem regressiva)
+  doorOpen?: boolean; // porta abrindo na frente da câmera
+  ringing?: boolean; // celular vibrando no quarto
+  bus?: {z: [number, number]; door?: [number, number]; arriveSec?: number};
+  glare?: boolean; // brilho do farol
+  maskReveal?: {pos: V3; rotY: [number, number]; size?: number};
+  captionOffset?: number; // frames até a 1ª fala (padrão 6)
 };
