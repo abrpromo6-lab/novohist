@@ -1,16 +1,15 @@
 {
   "1-0": {
     "file": "voz/ep03/1-0.mp3",
-    "sec": 2.71,
-    "who": "voce",
-    "text": "Sobe, Biel. Eu vou logo atrás."
+    "sec": 3.27,
+    "who": "biel",
+    "text": "Mano... o homem do mercado tá lá dentro."
   },
   "2-0": {
     "file": "voz/ep03/2-0.mp3",
-    "sec": 1.16,
-    "who": "biel",
-    "text": "Mano!",
-    "filtro": "abafado"
+    "sec": 2.48,
+    "who": "voce",
+    "text": "Sobe, Biel. Eu vou logo atrás."
   },
   "2-1": {
     "file": "voz/ep03/2-1.mp3",
@@ -20,33 +19,131 @@
   },
   "3-0": {
     "file": "voz/ep03/3-0.mp3",
-    "sec": 2.06,
-    "who": "voce",
-    "text": "Não... não, não, não."
+    "sec": 1.21,
+    "who": "biel",
+    "text": "Mano!",
+    "filtro": "abafado"
   },
   "5-0": {
     "file": "voz/ep03/5-0.mp3",
-    "sec": 2.56,
+    "sec": 4,
     "who": "voce",
-    "text": "Relaxa. Ele tá comigo."
+    "text": "Calma... pensa. Pensa."
   },
   "6-0": {
     "file": "voz/ep03/6-0.mp3",
-    "sec": 3.82,
+    "sec": 2.08,
     "who": "voce",
-    "text": "Ponto final. Sozinho. Antes das sete."
+    "text": "\"Relaxa. Ele tá comigo.\""
   },
   "7-0": {
     "file": "voz/ep03/7-0.mp3",
-    "sec": 2.56,
-    "who": "mascarado",
-    "text": "Eu sei onde fica o ponto final."
+    "sec": 3.64,
+    "who": "voce",
+    "text": "O irmão do Marquinhos... o menino que morreu no posto."
   },
   "8-0": {
     "file": "voz/ep03/8-0.mp3",
-    "sec": 2.6,
+    "sec": 2.64,
+    "who": "mascarado",
+    "text": "Eu sei onde fica o ponto final."
+  },
+  "1-1": {
+    "file": "voz/ep03/1-1.mp3",
+    "sec": 2.7,
+    "who": "voce",
+    "text": "Eu sei. É ele que quer pegar a mãe."
+  },
+  "1-2": {
+    "file": "voz/ep03/1-2.mp3",
+    "sec": 1.47,
+    "who": "biel",
+    "text": "E se ele pegar a gente?"
+  },
+  "1-3": {
+    "file": "voz/ep03/1-3.mp3",
+    "sec": 3.04,
+    "who": "voce",
+    "text": "Fica do meu lado. Ninguém encosta em você."
+  },
+  "3-1": {
+    "file": "voz/ep03/3-1.mp3",
+    "sec": 2.08,
+    "who": "voce",
+    "text": "Abre! Abre a porta!"
+  },
+  "3-2": {
+    "file": "voz/ep03/3-2.mp3",
+    "sec": 2.96,
+    "who": "motorista",
+    "text": "Lotou.",
+    "filtro": "abafado"
+  },
+  "4-0": {
+    "file": "voz/ep03/4-0.mp3",
+    "sec": 4.32,
+    "who": "voce",
+    "text": "Ele tá acenando... o homem do mercado tá acenando pra mim."
+  },
+  "4-1": {
+    "file": "voz/ep03/4-1.mp3",
+    "sec": 1.52,
+    "who": "voce",
+    "text": "Biel!"
+  },
+  "6-1": {
+    "file": "voz/ep03/6-1.mp3",
+    "sec": 1.37,
+    "who": "voce",
+    "text": "Quem é você?"
+  },
+  "7-1": {
+    "file": "voz/ep03/7-1.mp3",
+    "sec": 4.32,
+    "who": "voce",
+    "text": "\"Ponto final. Sozinho. Antes das sete.\""
+  },
+  "9-0": {
+    "file": "voz/ep03/9-0.mp3",
+    "sec": 1.92,
+    "who": "voce",
+    "text": "Foi você que deu a máscara pro Biel."
+  },
+  "9-1": {
+    "file": "voz/ep03/9-1.mp3",
+    "sec": 4.17,
+    "who": "mascarado",
+    "text": "Dei pra ele não ser escolhido."
+  },
+  "9-2": {
+    "file": "voz/ep03/9-2.mp3",
+    "sec": 7.2,
+    "who": "mascarado",
+    "text": "Vem comigo... ou ele fica sozinho com o irmão do Marquinhos."
+  },
+  "10-0": {
+    "file": "voz/ep03/10-0.mp3",
+    "sec": 5.72,
     "who": "cida",
-    "text": "Filho... tão batendo no portão.",
+    "text": "Filho... tão batendo no portão. Cadê o Biel?",
     "filtro": "telefone"
+  },
+  "10-1": {
+    "file": "voz/ep03/10-1.mp3",
+    "sec": 2.56,
+    "who": "voce",
+    "text": "Mãe, tranca tudo! Eu..."
+  },
+  "11-0": {
+    "file": "voz/ep03/11-0.mp3",
+    "sec": 3.2,
+    "who": "voce",
+    "text": "Se eu for... a mãe fica sozinha."
+  },
+  "11-1": {
+    "file": "voz/ep03/11-1.mp3",
+    "sec": 3.43,
+    "who": "voce",
+    "text": "Se eu voltar... o Biel fica com ele."
   }
 }

@@ -168,18 +168,23 @@ const phoneTexture = (title: string, text: string | string[], clock: string, cal
     x.font = '900 42px Nunito, Arial';
     x.fillText(title, 128, 145);
     // balões
-    let y = 240;
-    x.font = '800 46px Nunito, Arial';
-    for (const msg of Array.isArray(text) ? text : [text]) {
-      const lines = wrap(x, msg, 420);
-      const bh = lines.length * 58 + 46;
-      x.fillStyle = '#2a2e38';
+    let y = 230;
+    x.font = '800 40px Nunito, Arial';
+    for (const raw of Array.isArray(text) ? text : [text]) {
+      // "> texto" = mensagem enviada por você (verde, à direita)
+      const sent = raw.startsWith('> ');
+      const msg = sent ? raw.slice(2) : raw;
+      const lines = wrap(x, msg, 380);
+      const bw = Math.min(W - 60, Math.max(...lines.map((l) => x.measureText(l).width)) + 56);
+      const bh = lines.length * 50 + 40;
+      const bx = sent ? W - 24 - bw : 24;
+      x.fillStyle = sent ? '#1f6f4f' : '#2a2e38';
       x.beginPath();
-      x.roundRect(24, y, W - 60, bh, 26);
+      x.roundRect(bx, y, bw, bh, 26);
       x.fill();
       x.fillStyle = '#f2f2f2';
-      lines.forEach((l, i) => x.fillText(l, 50, y + 60 + i * 58));
-      y += bh + 26;
+      lines.forEach((l, i) => x.fillText(l, bx + 26, y + 52 + i * 50));
+      y += bh + 18;
     }
   }
   const t = new THREE.CanvasTexture(c);
