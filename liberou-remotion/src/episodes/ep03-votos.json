@@ -1,0 +1,13 @@
+{
+  "parte": 2,
+  "pergunta": "SOBE OU FICA?",
+  "opcoes": ["SOBE NO ÔNIBUS", "VOLTA PRA CASA"],
+  "pct": [50, 50],
+  "total": 2,
+  "comentarios": [
+    {"user": "@••••••••", "text": "IR", "opt": 1},
+    {"user": "@••••••••", "text": "2", "opt": 2}
+  ],
+  "resultado": "EMPATE",
+  "depois": "...então aconteceram os dois."
+}

@@ -71,7 +71,14 @@ export const Sky: React.FC<{time: TimeOfDay; radius?: number}> = ({time, radius 
   );
 };
 
-export const Lights: React.FC<{time: TimeOfDay | 'indoor' | 'market'}> = ({time}) => {
+export const Lights: React.FC<{time: TimeOfDay | 'indoor' | 'market' | 'dark'}> = ({time}) => {
+  if (time === 'dark')
+    return (
+      <>
+        <ambientLight intensity={0.2} color="#5a6aa8" />
+        <directionalLight position={[-4, 8, 2]} intensity={0.28} color="#8a9ad8" />
+      </>
+    );
   if (time === 'market')
     return (
       <>

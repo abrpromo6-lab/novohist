@@ -92,7 +92,12 @@ export const House: React.FC<{
 
 export const Neighbor: React.FC<{children: React.ReactNode}> = ({children}) => <>{children}</>;
 
-export const Street: React.FC<{time?: TimeOfDay; frame: number; sparks?: boolean}> = ({time = 'dusk', frame, sparks}) => {
+export const Street: React.FC<{time?: TimeOfDay; frame: number; sparks?: boolean; lampsOn?: number[]}> = ({
+  time = 'dusk',
+  frame,
+  sparks,
+  lampsOn,
+}) => {
   const night = time === 'night';
   const asphalt = useMemo(() => {
     const t = tileTex('#5d5f66', '#575960', 4);
@@ -125,9 +130,11 @@ export const Street: React.FC<{time?: TimeOfDay; frame: number; sparks?: boolean
           <Box size={[1.2, 0.08, 0.08]} color="#6d6d6d" position={[-0.6, 6.2, 0]} />
           <mesh position={[-1.1, 6.1, 0]}>
             <sphereGeometry args={[0.16, 12, 10]} />
-            <meshBasicMaterial color={night ? '#ffd27a' : '#fff1c6'} />
+            <meshBasicMaterial color={lampsOn && !lampsOn.includes(i) ? '#2e2e33' : night ? '#ffd27a' : '#fff1c6'} />
           </mesh>
-          {night && <pointLight position={[-1.1, 5.8, 0]} intensity={14} distance={11} color="#ffc26a" />}
+          {night && (!lampsOn || lampsOn.includes(i)) && (
+            <pointLight position={[-1.1, 5.8, 0]} intensity={lampsOn ? 22 : 14} distance={lampsOn ? 9 : 11} decay={1.6} color="#ffc26a" />
+          )}
           <Cyl r={0.012} h={8} color="#111" position={[0, 6.4, -4]} rotation={[Math.PI / 2, 0, 0]} outline={false} />
           <Cyl r={0.012} h={9} color="#111" position={[-3.8, 6.0, 0]} rotation={[0, 0, Math.PI / 2]} outline={false} />
         </group>

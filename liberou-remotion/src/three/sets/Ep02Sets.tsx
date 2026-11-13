@@ -286,7 +286,7 @@ export const Bedroom: React.FC<{frame: number; doorOpen?: boolean; ringing?: boo
 
 /* ---------------- ônibus ---------------- */
 
-const busSideTexture = (night: boolean) => {
+const busSideTexture = (night: boolean, silhouettes = false, wave = false) => {
   const c = document.createElement('canvas');
   c.width = 1024;
   c.height = 256;
@@ -300,6 +300,22 @@ const busSideTexture = (night: boolean) => {
   for (let i = 0; i < 8; i++) {
     x.fillStyle = night ? '#f2c98a' : '#6f9fc8';
     x.fillRect(30 + i * 124, 34, 104, 104);
+    if (silhouettes && i % 3 !== 1) {
+      // silhueta parada olhando pra fora
+      const cx = 30 + i * 124 + 52;
+      x.fillStyle = 'rgba(20,16,24,0.92)';
+      x.beginPath();
+      x.arc(cx, 82, 20, 0, Math.PI * 2);
+      x.fill();
+      x.fillRect(cx - 34, 104, 68, 40);
+      // uma delas acena (o homem do mercado)
+      if (i === 5) {
+        x.fillRect(wave ? cx + 26 : cx + 30, wave ? 50 : 58, 12, 50);
+        x.beginPath();
+        x.arc(wave ? cx + 32 : cx + 36, wave ? 46 : 54, 10, 0, Math.PI * 2);
+        x.fill();
+      }
+    }
     x.strokeStyle = '#141414';
     x.lineWidth = 5;
     x.strokeRect(30 + i * 124, 34, 104, 104);
@@ -310,13 +326,16 @@ const busSideTexture = (night: boolean) => {
 };
 
 // Ônibus andando no eixo z (frente aponta para +z). Porta fica no lado -x.
-export const Bus: React.FC<{position: [number, number, number]; door?: number; night?: boolean; lightsOn?: boolean}> = ({
-  position,
-  door = 0,
-  night = true,
-  lightsOn = true,
-}) => {
-  const side = useMemo(() => busSideTexture(night), [night]);
+export const Bus: React.FC<{
+  position: [number, number, number];
+  door?: number;
+  night?: boolean;
+  lightsOn?: boolean;
+  silhouettes?: boolean;
+  frame?: number;
+}> = ({position, door = 0, night = true, lightsOn = true, silhouettes = false, frame = 0}) => {
+  const wave = silhouettes && Math.floor(frame / 7) % 2 === 0;
+  const side = useMemo(() => busSideTexture(night, silhouettes, wave), [night, silhouettes, wave]);
   const dest = useMemo(() => textTex(['ÚLTIMO · CENTRO'], {bg: '#111111', fg: '#ffb13d', w: 512, h: 96}), []);
   const L = 11;
   return (
@@ -359,10 +378,16 @@ export const Bus: React.FC<{position: [number, number, number]; door?: number; n
           <meshBasicMaterial color={door > 0.05 ? '#f3d29a' : '#2a2f3a'} toneMapped={false} />
         </mesh>
         <group position={[0, 0, 0.55]} rotation={[0, -door * 1.4, 0]}>
-          <Box size={[0.06, 2.2, 0.55]} color="#9fc4d8" position={[0, 1.45, -0.27]} outline={0.008} />
+          <mesh position={[0, 1.45, -0.27]}>
+            <boxGeometry args={[0.05, 2.2, 0.55]} />
+            <meshBasicMaterial color="#8fb3c4" transparent opacity={0.55} />
+          </mesh>
         </group>
         <group position={[0, 0, -0.55]} rotation={[0, door * 1.4, 0]}>
-          <Box size={[0.06, 2.2, 0.55]} color="#9fc4d8" position={[0, 1.45, 0.27]} outline={0.008} />
+          <mesh position={[0, 1.45, 0.27]}>
+            <boxGeometry args={[0.05, 2.2, 0.55]} />
+            <meshBasicMaterial color="#8fb3c4" transparent opacity={0.55} />
+          </mesh>
         </group>
         {/* degraus e luz interna */}
         <Box size={[0.5, 0.2, 1.0]} color="#3a3f47" position={[0.3, 0.45, 0]} outline={false} />
@@ -374,11 +399,41 @@ export const Bus: React.FC<{position: [number, number, number]; door?: number; n
 
 /* ---------------- ponto de ônibus ---------------- */
 
-export const BusStop: React.FC<{frame: number; time?: TimeOfDay; bus?: {z: number; door: number}}> = ({frame, time = 'late', bus}) => {
+export type StopLamp = 'on' | 'flicker' | 'dies' | 'off';
+const lampLevel = (mode: StopLamp | undefined, frame: number, dur: number) => {
+  if (!mode || mode === 'on') return 1;
+  if (mode === 'off') return 0;
+  // piscadas irregulares (sempre iguais: sem aleatoriedade)
+  const pattern = [1, 1, 0.15, 1, 1, 1, 0, 1, 0.3, 1, 1, 0, 0, 1];
+  const v = pattern[Math.floor(frame / 3) % pattern.length];
+  if (mode === 'dies') return frame > dur * 0.55 ? 0 : v;
+  return v;
+};
+
+export const BusStop: React.FC<{
+  frame: number;
+  dur?: number;
+  time?: TimeOfDay;
+  bus?: {z: number; door: number};
+  stopLamp?: StopLamp;
+  lampsOn?: number[];
+  silhouettes?: boolean;
+}> = ({frame, dur = 120, time = 'late', bus, stopLamp, lampsOn, silhouettes}) => {
+  const lamp = lampLevel(stopLamp, frame, dur);
   const sign = useMemo(() => textTex(['PONTO', 'DE ÔNIBUS'], {bg: '#1f5fbf', fg: '#ffffff', w: 256, h: 192, border: '#ffffff'}), []);
   return (
     <group>
-      <Street time={time} frame={frame} />
+      <Street time={time} frame={frame} lampsOn={lampsOn} />
+      {/* lâmpada fria do abrigo */}
+      {stopLamp && (
+        <group position={[-4.55, 2.55, -2]}>
+          <mesh>
+            <boxGeometry args={[0.08, 0.05, 1.4]} />
+            <meshBasicMaterial color={lamp > 0.5 ? '#eaf6ff' : '#3a3d44'} toneMapped={false} />
+          </mesh>
+          {lamp > 0 && <pointLight position={[0.2, -0.3, 0]} intensity={9 * lamp} distance={6} decay={1.7} color="#d8ecff" />}
+        </group>
+      )}
       {/* abrigo do ponto */}
       <group position={[-4.6, 0.15, -2]}>
         <Box size={[1.4, 0.08, 3.4]} color="#7a7f88" position={[0, 2.5, 0]} outline={0.015} />
@@ -402,7 +457,7 @@ export const BusStop: React.FC<{frame: number; time?: TimeOfDay; bus?: {z: numbe
           <meshBasicMaterial map={sign} toneMapped={false} />
         </mesh>
       </group>
-      {bus && <Bus position={[-2.0, 0, bus.z]} door={bus.door} night />}
+      {bus && <Bus position={[-2.0, 0, bus.z]} door={bus.door} night silhouettes={silhouettes} frame={frame} />}
     </group>
   );
 };

@@ -12,7 +12,7 @@ import {Cart, ChainCoil, Jug, Market, Padlock} from '../three/sets/Market';
 import {Lights, Sky} from '../three/sets/common';
 import {Bedroom, BusInside, BusStop, MaskProp, StreetRun} from '../three/sets/Ep02Sets';
 import {Box} from '../three/toon';
-import {activeSpeaker, Black, Captions, Glare, HookText, Peek, RedTint, Stamp, Vignette, lineFrames} from './Overlays';
+import {activeSpeaker, Black, Captions, Glare, Grain, HookText, Peek, RedTint, Stamp, Vignette, VoteScreen, lineFrames} from './Overlays';
 import type {Actor, SceneSpec, V3} from './types';
 
 export const USE_FISHEYE = true;
@@ -103,52 +103,85 @@ const ActorView: React.FC<{a: Actor; frame: number; dur: number; speaking: strin
   );
 };
 
-const phoneTexture = (title: string, text: string, clock: string) => {
+const wrap = (x: CanvasRenderingContext2D, text: string, max: number) => {
+  const out: string[] = [];
+  let cur = '';
+  for (const w of text.split(' ')) {
+    const t = cur ? cur + ' ' + w : w;
+    if (x.measureText(t).width > max) {
+      out.push(cur);
+      cur = w;
+    } else cur = t;
+  }
+  out.push(cur);
+  return out;
+};
+
+const phoneTexture = (title: string, text: string | string[], clock: string, call?: boolean) => {
   const W = 540;
   const H = 1120;
   const c = document.createElement('canvas');
   c.width = W;
   c.height = H;
   const x = c.getContext('2d')!;
-  x.fillStyle = '#ece5dd';
-  x.fillRect(0, 0, W, H);
-  // barra de status + cabeçalho do chat
-  x.fillStyle = '#1f6f5c';
-  x.fillRect(0, 0, W, 190);
-  x.fillStyle = '#fff';
-  x.font = '800 32px Nunito, Arial';
-  x.fillText(clock, 28, 46);
-  x.beginPath();
-  x.arc(70, 130, 40, 0, 6.28);
-  x.fillStyle = '#ff9ee5';
-  x.fill();
-  x.fillStyle = '#fff';
-  x.font = '900 48px Nunito, Arial';
-  x.fillText(title, 128, 147);
-  // balão grande
-  x.font = '800 46px Nunito, Arial';
-  const words = text.split(' ');
-  const lines: string[] = [];
-  let cur = '';
-  for (const w of words) {
-    const t = cur ? cur + ' ' + w : w;
-    if (x.measureText(t).width > 430) {
-      lines.push(cur);
-      cur = w;
-    } else cur = t;
+  if (call) {
+    // tela de chamada recebida
+    const g = x.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, '#1b2a4a');
+    g.addColorStop(1, '#0a0f1c');
+    x.fillStyle = g;
+    x.fillRect(0, 0, W, H);
+    x.fillStyle = '#fff';
+    x.font = '800 32px Nunito, Arial';
+    x.fillText(clock, 28, 46);
+    x.textAlign = 'center';
+    x.fillStyle = '#ffd23f';
+    x.beginPath();
+    x.arc(W / 2, 330, 110, 0, 6.28);
+    x.fill();
+    x.fillStyle = '#fff';
+    x.font = '900 78px Nunito, Arial';
+    x.fillText(title, W / 2, 560);
+    x.font = '700 38px Nunito, Arial';
+    x.fillText('chamando...', W / 2, 620);
+    x.fillStyle = '#e5322d';
+    x.beginPath();
+    x.arc(150, 930, 62, 0, 6.28);
+    x.fill();
+    x.fillStyle = '#2ecc71';
+    x.beginPath();
+    x.arc(W - 150, 930, 62, 0, 6.28);
+    x.fill();
+  } else {
+    x.fillStyle = '#0f1115';
+    x.fillRect(0, 0, W, H);
+    x.fillStyle = '#1c1f26';
+    x.fillRect(0, 0, W, 190);
+    x.fillStyle = '#fff';
+    x.font = '800 32px Nunito, Arial';
+    x.fillText(clock, 28, 46);
+    x.beginPath();
+    x.arc(70, 130, 40, 0, 6.28);
+    x.fillStyle = '#4a4f5c';
+    x.fill();
+    x.fillStyle = '#fff';
+    x.font = '900 42px Nunito, Arial';
+    x.fillText(title, 128, 145);
+    // balões
+    let y = 240;
+    x.font = '800 46px Nunito, Arial';
+    for (const msg of Array.isArray(text) ? text : [text]) {
+      const lines = wrap(x, msg, 420);
+      const bh = lines.length * 58 + 46;
+      x.fillStyle = '#2a2e38';
+      x.beginPath();
+      x.roundRect(24, y, W - 60, bh, 26);
+      x.fill();
+      x.fillStyle = '#f2f2f2';
+      lines.forEach((l, i) => x.fillText(l, 50, y + 60 + i * 58));
+      y += bh + 26;
+    }
   }
-  lines.push(cur);
-  const lh = 58;
-  const bh = lines.length * lh + 50;
-  x.fillStyle = '#ffffff';
-  x.beginPath();
-  x.roundRect(24, 240, W - 48, bh, 26);
-  x.fill();
-  x.fillStyle = '#141414';
-  lines.forEach((l, i) => x.fillText(l, 50, 300 + i * lh));
-  x.fillStyle = '#7a7a7a';
-  x.font = '700 28px Nunito, Arial';
-  x.fillText(clock, W - 120, 240 + bh - 16);
   const t = new THREE.CanvasTexture(c);
   t.colorSpace = THREE.SRGBColorSpace;
   t.anisotropy = 8;
@@ -160,7 +193,10 @@ const busState = (spec: SceneSpec, frame: number, dur: number) => {
   if (!spec.bus) return undefined;
   const fps = 30;
   const arrive = (spec.bus.arriveSec ?? dur / fps) * fps;
-  const z = interpolate(frame, [0, arrive], spec.bus.z, {extrapolateRight: 'clamp', easing: Easing.out(Easing.cubic)});
+  const z = interpolate(frame, [0, arrive], spec.bus.z, {
+    extrapolateRight: 'clamp',
+    easing: spec.bus.depart ? Easing.in(Easing.quad) : Easing.out(Easing.cubic),
+  });
   const door = spec.bus.door
     ? interpolate(frame, [dur * 0.2, dur * 0.45], spec.bus.door, {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'})
     : 0;
@@ -170,16 +206,36 @@ const busState = (spec: SceneSpec, frame: number, dur: number) => {
 const World: React.FC<{spec: SceneSpec; frame: number; dur: number; speaking: string | null}> = ({spec, frame, dur, speaking}) => {
   const time = spec.time ?? 'dusk';
   const phoneTex = useMemo(
-    () => (spec.phone ? phoneTexture(spec.phone.title, spec.phone.text, spec.phone.clock) : undefined),
+    () => (spec.phone ? phoneTexture(spec.phone.title, spec.phone.text, spec.phone.clock, spec.phone.call) : undefined),
     [spec.phone],
   );
   const set = spec.set;
   return (
     <>
-      <Lights time={set.startsWith('market') || set === 'bus-inside' ? 'market' : set === 'kitchen' || set === 'bedroom' ? 'indoor' : time} />
+      <Lights
+        time={
+          spec.dark
+            ? 'dark'
+            : set.startsWith('market') || set === 'bus-inside'
+              ? 'market'
+              : set === 'kitchen' || set === 'bedroom'
+                ? 'indoor'
+                : time
+        }
+      />
       {set === 'bedroom' && <Bedroom frame={frame} doorOpen={spec.doorOpen} ringing={spec.ringing} time={time} />}
       {set === 'street-run' && <StreetRun frame={frame} time={time} />}
-      {set === 'busstop' && <BusStop frame={frame} time={time} bus={busState(spec, frame, dur)} />}
+      {set === 'busstop' && (
+        <BusStop
+          frame={frame}
+          dur={dur}
+          time={time}
+          bus={busState(spec, frame, dur)}
+          stopLamp={spec.stopLamp}
+          lampsOn={spec.lampsOn}
+          silhouettes={spec.silhouettes}
+        />
+      )}
       {set === 'bus-inside' && <BusInside frame={frame} />}
       {spec.maskReveal && (
         <MaskProp
@@ -250,6 +306,15 @@ export const SceneView: React.FC<{spec: SceneSpec}> = ({spec}) => {
   const blur =
     spec.blur === 'all' ? 6 : spec.blur === 'start' ? interpolate(frame, [0, 10], [14, 0], {extrapolateRight: 'clamp'}) : 0;
 
+  if (spec.set === 'vote' && spec.vote) {
+    return (
+      <AbsoluteFill>
+        <VoteScreen vote={spec.vote} />
+        <Voices spec={spec} />
+      </AbsoluteFill>
+    );
+  }
+
   if (spec.set === 'black') {
     return (
       <AbsoluteFill>
@@ -262,7 +327,14 @@ export const SceneView: React.FC<{spec: SceneSpec}> = ({spec}) => {
 
   return (
     <AbsoluteFill style={{background: '#000'}}>
-      <AbsoluteFill style={{filter: blur ? `blur(${blur}px)` : undefined}}>
+      <AbsoluteFill
+        style={{
+          filter:
+            [blur ? `blur(${blur}px)` : '', spec.dark ? 'saturate(0.72) contrast(1.12) brightness(0.95)' : '']
+              .filter(Boolean)
+              .join(' ') || undefined,
+        }}
+      >
         <ThreeCanvas
           width={width}
           height={height}
@@ -279,7 +351,8 @@ export const SceneView: React.FC<{spec: SceneSpec}> = ({spec}) => {
           )}
         </ThreeCanvas>
       </AbsoluteFill>
-      <Vignette strength={spec.time === 'night' ? 0.75 : 0.4} />
+      <Vignette strength={spec.dark ? 0.85 : spec.time === 'night' ? 0.75 : 0.4} />
+      {spec.dark && <Grain />}
       {spec.red && <RedTint />}
       {spec.peek && <Peek />}
       {spec.glare && <Glare strength={interpolate(frame, [0, dur * 0.7], [0.1, 1], {extrapolateRight: 'clamp'})} />}

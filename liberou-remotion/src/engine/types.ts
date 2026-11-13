@@ -15,7 +15,8 @@ export type Speaker =
   | 'caixa'
   | 'tiarosa'
   | 'tonho'
-  | 'motorista';
+  | 'motorista'
+  | 'mascarado';
 
 export const SPEAKER_COLOR: Record<Speaker, string> = {
   voce: '#ffffff',
@@ -29,9 +30,10 @@ export const SPEAKER_COLOR: Record<Speaker, string> = {
   tiarosa: '#ff9ee5',
   tonho: '#ffa94d',
   motorista: '#d7dee3',
+  mascarado: '#ff5a4f',
 };
 
-export type Line = {who: Speaker; text: string; sec?: number; audio?: string};
+export type Line = {who: Speaker; text: string; sec?: number; audio?: string; filtro?: 'telefone' | 'abafado'};
 
 export type Actor = {
   id: string;
@@ -65,7 +67,8 @@ export type SetId =
   | 'bedroom'
   | 'street-run'
   | 'busstop'
-  | 'bus-inside';
+  | 'bus-inside'
+  | 'vote';
 
 export type Cam = {
   from: V3;
@@ -78,6 +81,17 @@ export type Cam = {
 
 // Efeito sonoro: arquivo em public/sfx/<id>.mp3, começa em "at" segundos
 export type Sfx = {id: string; at?: number; vol?: number; loop?: boolean};
+
+export type Vote = {
+  parte: number;
+  pergunta: string; // ex.: "SOBE OU FICA?"
+  opcoes: [string, string];
+  pct: [number, number];
+  total: number;
+  comentarios: {user: string; text: string; opt: 1 | 2}[];
+  resultado: string; // ex.: "EMPATE"
+  depois?: string; // frase embaixo
+};
 
 export type SceneSpec = {
   id: number;
@@ -93,7 +107,7 @@ export type SceneSpec = {
   red?: boolean;
   blur?: 'start' | 'all';
   peek?: boolean;
-  phone?: {title: string; text: string; clock: string};
+  phone?: {title: string; text: string | string[]; clock: string; call?: boolean};
   sparks?: boolean;
   sign?: boolean;
   captionTop?: boolean; // legenda no alto (ex.: cena do celular)
@@ -102,8 +116,13 @@ export type SceneSpec = {
   stampAlert?: boolean; // etiqueta vermelha (contagem regressiva)
   doorOpen?: boolean; // porta abrindo na frente da câmera
   ringing?: boolean; // celular vibrando no quarto
-  bus?: {z: [number, number]; door?: [number, number]; arriveSec?: number};
+  bus?: {z: [number, number]; door?: [number, number]; arriveSec?: number; depart?: boolean};
   glare?: boolean; // brilho do farol
   maskReveal?: {pos: V3; rotY: [number, number]; size?: number};
   captionOffset?: number; // frames até a 1ª fala (padrão 6)
+  dark?: boolean; // estilo escuro de cinema (uma fonte de luz, cor apagada, granulação)
+  stopLamp?: 'on' | 'flicker' | 'dies' | 'off';
+  lampsOn?: number[]; // quais postes da rua ficam acesos
+  silhouettes?: boolean; // silhuetas nas janelas do ônibus
+  vote?: Vote;
 };

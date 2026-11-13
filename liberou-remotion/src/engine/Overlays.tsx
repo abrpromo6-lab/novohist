@@ -2,7 +2,7 @@ import React from 'react';
 import {AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig} from 'remotion';
 import {loadFont} from '@remotion/google-fonts/Nunito';
 import {SPEAKER_COLOR} from './types';
-import type {Line} from './types';
+import type {Line, Vote} from './types';
 
 export const {fontFamily} = loadFont('normal', {weights: ['800', '900'], subsets: ['latin', 'latin-ext']});
 
@@ -126,10 +126,11 @@ export const Black: React.FC = () => {
   );
 };
 
-export const EndCard: React.FC<{opt1: string; opt2: string; next: number; icon1?: string; icon2?: string}> = ({
+export const EndCard: React.FC<{opt1: string; opt2: string; next: number; icon1?: string; icon2?: string; title?: string}> = ({
   opt1,
   opt2,
   next,
+  title,
   icon1 = '1',
   icon2 = '2',
 }) => {
@@ -215,7 +216,14 @@ export const EndCard: React.FC<{opt1: string; opt2: string; next: number; icon1?
             lineHeight: 1.08,
           }}
         >
-          {main}
+          {main.includes('|') ? (
+            <div>
+              <div style={{fontSize: main.split('|')[0].length > 4 ? 92 : 112, lineHeight: 0.95, letterSpacing: -1, color: n === 1 ? '#c41f1f' : '#1655c4'}}>{main.split('|')[0]}</div>
+              <div style={{fontSize: 44, lineHeight: 1.1, marginTop: 14}}>{main.split('|')[1]}</div>
+            </div>
+          ) : (
+            main
+          )}
         </div>
         {/* porém */}
         {sub ? (
@@ -260,9 +268,15 @@ export const EndCard: React.FC<{opt1: string; opt2: string; next: number; icon1?
           marginBottom: 60,
         }}
       >
-        O QUE VOCÊ
-        <br />
-        FARIA?
+        {title ? (
+          title
+        ) : (
+          <>
+            O QUE VOCÊ
+            <br />
+            FARIA?
+          </>
+        )}
       </div>
       <div style={{position: 'relative', display: 'flex', gap: 64, alignItems: 'stretch'}}>
         {card(1, opt1, icon1, c1)}
@@ -309,7 +323,7 @@ export const EndCard: React.FC<{opt1: string; opt2: string; next: number; icon1?
           COMENTA 1 OU 2
         </div>
         <div style={{fontFamily, fontWeight: 800, fontSize: 40, color: '#fff', marginTop: 16}}>
-          Segue pra ver a parte {next}
+          SIGA PRA NÃO PERDER A PARTE {next}
         </div>
       </div>
     </AbsoluteFill>
@@ -358,3 +372,179 @@ export const Glare: React.FC<{strength: number}> = ({strength}) => (
     }}
   />
 );
+
+// Granulação de filme bem leve (não pode parecer sujeira)
+export const Grain: React.FC = () => {
+  const frame = useCurrentFrame();
+  const id = `g${frame % 8}`;
+  return (
+    <AbsoluteFill style={{opacity: 0.07, mixBlendMode: 'overlay', pointerEvents: 'none'}}>
+      <svg width="100%" height="100%">
+        <filter id={id}>
+          <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves={2} seed={frame % 8} />
+          <feColorMatrix type="saturate" values="0" />
+        </filter>
+        <rect width="100%" height="100%" filter={`url(#${id})`} />
+      </svg>
+    </AbsoluteFill>
+  );
+};
+
+// Tela de votação com os comentários reais
+export const VoteScreen: React.FC<{vote: Vote}> = ({vote}) => {
+  const frame = useCurrentFrame();
+  const {fps} = useVideoConfig();
+  const sp = (d: number, damping = 12) => spring({frame: frame - d, fps, config: {damping, stiffness: 160, mass: 0.7}});
+  const COR: [string, string] = ['#e5322d', '#2f7bff'];
+  const fill = interpolate(frame, [10, 46], [0, 1], {
+    extrapolateLeft: 'clamp',
+    extrapolateRight: 'clamp',
+    easing: (t) => 1 - Math.pow(1 - t, 3),
+  });
+  const stampAt = 58;
+  const st = sp(stampAt, 9);
+  const [w1, w2] = vote.pergunta.replace('?', '').split(' OU ');
+  const live = Math.floor(frame / 15) % 2 === 0;
+  return (
+    <AbsoluteFill style={{background: 'radial-gradient(ellipse at 50% 30%, #1a1d27 0%, #0a0b0f 70%)', alignItems: 'center', fontFamily}}>
+      <div style={{marginTop: 150, display: 'flex', alignItems: 'center', gap: 16, opacity: sp(0)}}>
+        <div style={{width: 18, height: 18, borderRadius: 9, background: live ? '#e5322d' : '#5a1212'}} />
+        <div style={{color: '#cfd3dc', fontWeight: 800, fontSize: 38, letterSpacing: 4}}>PARTE {vote.parte} · A VOTAÇÃO</div>
+      </div>
+      <div
+        style={{
+          marginTop: 26,
+          fontWeight: 900,
+          fontSize: 132,
+          lineHeight: 1,
+          transform: `scale(${0.85 + sp(2) * 0.15})`,
+          opacity: sp(2),
+          WebkitTextStroke: '10px #000',
+          paintOrder: 'stroke fill',
+        }}
+      >
+        <span style={{color: COR[0]}}>{w1}</span>
+        <span style={{color: '#ffffff', fontSize: 80}}> OU </span>
+        <span style={{color: COR[1]}}>{w2}</span>
+        <span style={{color: '#ffffff'}}>?</span>
+      </div>
+      <div style={{color: '#8b91a0', fontWeight: 800, fontSize: 36, marginTop: 14}}>
+        {Math.round(vote.total * fill)} {vote.total === 1 ? 'VOTO' : 'VOTOS'}
+      </div>
+      <div style={{width: 900, marginTop: 50}}>
+        {[0, 1].map((i) => (
+          <div key={i} style={{marginBottom: 26}}>
+            <div style={{display: 'flex', justifyContent: 'space-between', color: '#fff', fontWeight: 900, fontSize: 46, marginBottom: 10}}>
+              <span>
+                <span style={{color: COR[i]}}>{i + 1}</span> {vote.opcoes[i]}
+              </span>
+              <span>{Math.round(vote.pct[i] * fill)}%</span>
+            </div>
+            <div style={{height: 34, borderRadius: 17, background: '#1e2230', overflow: 'hidden'}}>
+              <div
+                style={{
+                  width: `${vote.pct[i] * fill}%`,
+                  height: '100%',
+                  borderRadius: 17,
+                  background: `linear-gradient(90deg, ${COR[i]}aa, ${COR[i]})`,
+                  boxShadow: `0 0 24px ${COR[i]}88`,
+                }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+      <div style={{width: 900, marginTop: 24}}>
+        {vote.comentarios.map((cm, i) => {
+          const a = sp(18 + i * 9);
+          return (
+            <div
+              key={i}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 22,
+                background: '#161923',
+                border: `3px solid ${COR[cm.opt - 1]}66`,
+                borderRadius: 22,
+                padding: '20px 26px',
+                marginBottom: 18,
+                opacity: a,
+                transform: `translateX(${(1 - a) * (i % 2 ? 120 : -120)}px)`,
+              }}
+            >
+              <div
+                style={{
+                  width: 64,
+                  height: 64,
+                  borderRadius: 32,
+                  background: COR[cm.opt - 1],
+                  color: '#fff',
+                  fontWeight: 900,
+                  fontSize: 38,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}
+              >
+                {cm.opt}
+              </div>
+              <div>
+                <div style={{color: '#8b91a0', fontWeight: 800, fontSize: 30}}>{cm.user}</div>
+                <div style={{color: '#ffffff', fontWeight: 800, fontSize: 42}}>{cm.text}</div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <div
+        style={{
+          position: 'absolute',
+          top: 1230,
+          left: 0,
+          right: 0,
+          display: 'flex',
+          justifyContent: 'center',
+          opacity: frame >= stampAt ? 1 : 0,
+        }}
+      >
+        <div
+          style={{
+            border: '12px solid #e5322d',
+            color: '#e5322d',
+            background: 'rgba(10,11,15,0.88)',
+            borderRadius: 18,
+            padding: '6px 46px',
+            fontWeight: 900,
+            fontSize: 150,
+            letterSpacing: 6,
+            transform: `rotate(-7deg) scale(${1.5 - st * 0.5})`,
+            boxShadow: '0 0 60px rgba(229,50,45,0.45)',
+          }}
+        >
+          {vote.resultado}
+        </div>
+      </div>
+      {vote.depois && (
+        <div
+          style={{
+            position: 'absolute',
+            bottom: 200,
+            left: 60,
+            right: 60,
+            textAlign: 'center',
+            color: '#ffffff',
+            fontWeight: 900,
+            fontSize: 70,
+            opacity: interpolate(frame, [stampAt + 14, stampAt + 22], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'}),
+            WebkitTextStroke: '8px #000',
+            paintOrder: 'stroke fill',
+          }}
+        >
+          {vote.depois}
+        </div>
+      )}
+    </AbsoluteFill>
+  );
+};

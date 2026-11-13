@@ -1,0 +1,52 @@
+{
+  "1-0": {
+    "file": "voz/ep03/1-0.mp3",
+    "sec": 2.71,
+    "who": "voce",
+    "text": "Sobe, Biel. Eu vou logo atrás."
+  },
+  "2-0": {
+    "file": "voz/ep03/2-0.mp3",
+    "sec": 1.16,
+    "who": "biel",
+    "text": "Mano!",
+    "filtro": "abafado"
+  },
+  "2-1": {
+    "file": "voz/ep03/2-1.mp3",
+    "sec": 2.24,
+    "who": "voce",
+    "text": "Abre! Abre a porta!"
+  },
+  "3-0": {
+    "file": "voz/ep03/3-0.mp3",
+    "sec": 2.06,
+    "who": "voce",
+    "text": "Não... não, não, não."
+  },
+  "5-0": {
+    "file": "voz/ep03/5-0.mp3",
+    "sec": 2.56,
+    "who": "voce",
+    "text": "Relaxa. Ele tá comigo."
+  },
+  "6-0": {
+    "file": "voz/ep03/6-0.mp3",
+    "sec": 3.82,
+    "who": "voce",
+    "text": "Ponto final. Sozinho. Antes das sete."
+  },
+  "7-0": {
+    "file": "voz/ep03/7-0.mp3",
+    "sec": 2.56,
+    "who": "mascarado",
+    "text": "Eu sei onde fica o ponto final."
+  },
+  "8-0": {
+    "file": "voz/ep03/8-0.mp3",
+    "sec": 2.6,
+    "who": "cida",
+    "text": "Filho... tão batendo no portão.",
+    "filtro": "telefone"
+  }
+}

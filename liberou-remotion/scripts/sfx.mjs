@@ -29,6 +29,12 @@ export const SFX = {
   porta_onibus: {p: 'pneumatic bus door opening with air hiss', d: 2},
   porta_onibus_fecha: {p: 'pneumatic bus door closing with air hiss and thud', d: 2},
   motor_onibus: {p: 'city bus diesel engine idling, heard from inside, steady low rumble, no music', d: 10, amb: true},
+  murro_porta: {p: 'fists banging hard on a glass bus door from outside, desperate, three hits', d: 2},
+  onibus_partindo: {p: 'city bus pulling away and accelerating into the distance at night, diesel engine fading', d: 6},
+  lampada: {p: 'fluorescent tube light buzzing, flickering with electric clicks and then dying out', d: 3},
+  batidas_vidro: {p: 'three slow deliberate knocks on a glass panel of a bus shelter at night, close', d: 3},
+  toque_celular: {p: 'smartphone ringtone ringing, simple marimba melody, close', d: 4},
+  noite_vazia: {p: 'empty street at night, distant city hum, crickets, very quiet and tense, no music', d: 12, amb: true},
   rua_noite: {p: 'quiet street at dusk, distant dogs barking, a gate closing far away, light wind, no music', d: 12, amb: true},
 };
 

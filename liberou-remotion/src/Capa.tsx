@@ -5,7 +5,7 @@ import {fontFamily} from './engine/Overlays';
 import type {SceneSpec} from './engine/types';
 
 // Capa: frame do mascarado sorrindo + título grande
-export const Capa: React.FC<{spec: SceneSpec; ep: string; hook: string}> = ({spec, ep, hook}) => (
+export const Capa: React.FC<{spec: SceneSpec; ep: string; hook: string; cta?: string}> = ({spec, ep, hook, cta}) => (
   <AbsoluteFill>
     <SceneView spec={{...spec, lines: [], sfx: []}} />
     <AbsoluteFill
@@ -51,6 +51,11 @@ export const Capa: React.FC<{spec: SceneSpec; ep: string; hook: string}> = ({spe
       >
         {ep}
       </div>
+      {cta ? (
+        <div style={{marginTop: 18, color: '#ffffff', fontFamily, fontWeight: 900, fontSize: 44, letterSpacing: 3, WebkitTextStroke: '8px #0b0b0b', paintOrder: 'stroke fill'}}>
+          {cta}
+        </div>
+      ) : null}
     </div>
     <div
       style={{

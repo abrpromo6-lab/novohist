@@ -131,6 +131,7 @@ const HandsInner: React.FC<{pose: HandPose; frame: number; phoneTex?: THREE.Text
     // celular grande no centro, mão esquerda segurando por baixo, polegar na lateral
     return (
       <group position={[0, 0.07 + bob * 0.4, -0.33]}>
+        <pointLight position={[0, 0.05, 0.12]} intensity={0.5} distance={0.7} color="#cfe0ff" />
         <group rotation={[0.04, 0, 0]} scale={1.45}>
           {phoneTex && <Phone tex={phoneTex} />}
         </group>
